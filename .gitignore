@@ -1,0 +1,8 @@
+node_modules/
+*.pdf
+examples/*.html
+.DS_Store
+Thumbs.db
+npm-debug.log*
+.idea/
+.vscode/

@@ -1,0 +1,25 @@
+{
+  "name": "resume-to-pdf",
+  "version": "0.1.0",
+  "description": "Turn a Markdown resume into a polished A4 PDF from the command line.",
+  "type": "module",
+  "license": "MIT",
+  "author": "jianjustin",
+  "bin": {
+    "resume-to-pdf": "bin/resume-to-pdf.js"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "node bin/resume-to-pdf.js build",
+    "preview": "node bin/resume-to-pdf.js preview",
+    "themes": "node bin/resume-to-pdf.js themes",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "js-yaml": "^4.3.2",
+    "markdown-it": "^14.3.3",
+    "puppeteer": "^25.16.0"
+  }
+}
