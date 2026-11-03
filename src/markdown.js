@@ -40,6 +40,7 @@ export function createMarkdown() {
   md.core.ruler.push('resume_wrappers', (state) => {
     const tokens = [];
     let sectionOpen = false;
+    let bodyPending = false;
     let entryOpen = false;
     const addHtml = (content) => tokens.push(htmlToken(state, 'html_block', `${content}\n`));
     const closeEntry = () => {
@@ -48,7 +49,7 @@ export function createMarkdown() {
     };
     const closeSection = () => {
       closeEntry();
-      if (sectionOpen) addHtml('</section>');
+      if (sectionOpen) addHtml('</div></section>');
       sectionOpen = false;
     };
 
@@ -60,6 +61,7 @@ export function createMarkdown() {
           closeSection();
           addHtml('<section class="section">');
           sectionOpen = true;
+          bodyPending = true;
         } else if (token.tag === 'h3' && sectionOpen) {
           closeEntry();
           addHtml('<article class="entry">');
@@ -67,6 +69,11 @@ export function createMarkdown() {
         }
       }
       tokens.push(token);
+      // Keep the h2 outside the body so themes can style it as a separate tab.
+      if (bodyPending && token.type === 'heading_close') {
+        addHtml('<div class="section-body">');
+        bodyPending = false;
+      }
     }
     closeSection();
     state.tokens = tokens;

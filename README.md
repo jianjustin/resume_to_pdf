@@ -202,6 +202,7 @@ Themes rely on these class names; keep them when using a custom template:
   </header>
   <section class="section">
     <h2>工作经历</h2>
+    <div class="section-body">
     <article class="entry">
       <h3 class="entry-head">
         <span class="entry-main">
@@ -212,11 +213,12 @@ Themes rely on these class names; keep them when using a custom template:
       </h3>
       …
     </article>
+    </div>
   </section>
 </main>
 ```
 
-`resume` is the page wrapper; `resume-header`, `name`, `role`, and `contact` form the optional header. An `h2` starts a `section`. Within a section, each `h3` starts an `article.entry`, even without a date. Recognized dated `h3` / `h4` headings use `entry-head`, `entry-main`, `entry-title`, optional `entry-sub`, and `entry-date`. An undated `h3` has no `entry-head` or generated spans. An `h4` does not start another article.
+`resume` is the page wrapper; `resume-header`, `name`, `role`, and `contact` form the optional header. An `h2` starts a `section`; the content after it is wrapped in `section-body`. Within a section, each `h3` starts an `article.entry`, even without a date. Recognized dated `h3` / `h4` headings use `entry-head`, `entry-main`, `entry-title`, optional `entry-sub`, and `entry-date`. An undated `h3` has no `entry-head` or generated spans. An `h4` does not start another article.
 
 ### Fonts and style iteration
 

@@ -85,11 +85,11 @@ test('h4 gets entry layout but is not wrapped', () => {
 test('wraps h2 into sections and h3 into entries', () => {
   const md = 'intro\n\n## 工作经历\n\n### A（2020 – 2021）\n\n- x\n\n### B\n\ntext\n\n## 技能\n\n- y\n';
   assert.equal(flat(renderBody(md)),
-    '<p>intro</p><section class="section"><h2>工作经历</h2>' +
+    '<p>intro</p><section class="section"><h2>工作经历</h2><div class="section-body">' +
     '<article class="entry"><h3 class="entry-head"><span class="entry-main"><span class="entry-title">A</span></span>' +
     '<span class="entry-date">2020 – 2021</span></h3><ul><li>x</li></ul></article>' +
-    '<article class="entry"><h3>B</h3><p>text</p></article></section>' +
-    '<section class="section"><h2>技能</h2><ul><li>y</li></ul></section>');
+    '<article class="entry"><h3>B</h3><p>text</p></article></div></section>' +
+    '<section class="section"><h2>技能</h2><div class="section-body"><ul><li>y</li></ul></div></section>');
 });
 test('headings nested in blockquotes are not wrapped', () => {
   assert.ok(!renderBody('> ### Quote（2020）').includes('<article'));
@@ -116,23 +116,23 @@ test('h3 before the first top-level h2 is unwrapped but still transformed', () =
   assert.equal(flat(renderBody('### Intro（2020）\n\ntext\n\n## Section\n\n### Entry')),
     '<h3 class="entry-head"><span class="entry-main"><span class="entry-title">Intro</span></span>' +
     '<span class="entry-date">2020</span></h3><p>text</p>' +
-    '<section class="section"><h2>Section</h2><article class="entry"><h3>Entry</h3></article></section>');
+    '<section class="section"><h2>Section</h2><div class="section-body"><article class="entry"><h3>Entry</h3></article></div></section>');
 });
 test('top-level h1 closes the article and section until another h2 opens a section', () => {
   assert.equal(flat(renderBody('## First\n\n### Entry\n\ntext\n\n# Reset\n\n### Outside\n\n## Second\n\n### Next')),
-    '<section class="section"><h2>First</h2><article class="entry"><h3>Entry</h3><p>text</p></article></section>' +
-    '<h1>Reset</h1><h3>Outside</h3><section class="section"><h2>Second</h2>' +
-    '<article class="entry"><h3>Next</h3></article></section>');
+    '<section class="section"><h2>First</h2><div class="section-body"><article class="entry"><h3>Entry</h3><p>text</p></article></div></section>' +
+    '<h1>Reset</h1><h3>Outside</h3><section class="section"><h2>Second</h2><div class="section-body">' +
+    '<article class="entry"><h3>Next</h3></article></div></section>');
 });
 test('top-level h1 closes a section even when no article is open', () => {
   assert.equal(flat(renderBody('## Section\n\ntext\n\n# Outside\n\nafter')),
-    '<section class="section"><h2>Section</h2><p>text</p></section><h1>Outside</h1><p>after</p>');
+    '<section class="section"><h2>Section</h2><div class="section-body"><p>text</p></div></section><h1>Outside</h1><p>after</p>');
 });
 test('nested h1, h2 and h3 do not open or close wrappers', () => {
   assert.equal(flat(renderBody('## Section\n\n### Entry\n\n> # Nested h1\n>\n> ## Nested h2\n>\n> ### Nested h3\n\nafter')),
-    '<section class="section"><h2>Section</h2><article class="entry"><h3>Entry</h3>' +
+    '<section class="section"><h2>Section</h2><div class="section-body"><article class="entry"><h3>Entry</h3>' +
     '<blockquote><h1>Nested h1</h1><h2>Nested h2</h2><h3>Nested h3</h3></blockquote>' +
-    '<p>after</p></article></section>');
+    '<p>after</p></article></div></section>');
 });
 test('nested h2 does not enable wrappers and nested entry headings still transform', () => {
   assert.equal(flat(renderBody('> ## Nested\n>\n> ### Quote（2020）\n>\n> #### Detail（2021）\n\n### Outside')),
@@ -142,13 +142,13 @@ test('nested h2 does not enable wrappers and nested entry headings still transfo
 });
 test('headings inside lists do not control wrappers', () => {
   assert.equal(flat(renderBody('## Section\n\n### Entry\n\n- # Nested h1\n\n- ## Nested h2\n\n- ### Nested h3\n\nafter')),
-    '<section class="section"><h2>Section</h2><article class="entry"><h3>Entry</h3>' +
+    '<section class="section"><h2>Section</h2><div class="section-body"><article class="entry"><h3>Entry</h3>' +
     '<ul><li><h1>Nested h1</h1></li><li><h2>Nested h2</h2></li><li><h3>Nested h3</h3></li></ul>' +
-    '<p>after</p></article></section>');
+    '<p>after</p></article></div></section>');
 });
 test('h4 stays inside the current article without opening another wrapper', () => {
   assert.equal(flat(renderBody('## Section\n\n### Entry\n\n#### Detail\n\ntext')),
-    '<section class="section"><h2>Section</h2><article class="entry"><h3>Entry</h3><h4>Detail</h4><p>text</p></article></section>');
+    '<section class="section"><h2>Section</h2><div class="section-body"><article class="entry"><h3>Entry</h3><h4>Detail</h4><p>text</p></article></div></section>');
 });
 test('renderBody does not retain wrapper state between calls', () => {
   renderBody('## Section\n\n### Entry');

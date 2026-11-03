@@ -202,6 +202,7 @@ themes/my-theme/
   </header>
   <section class="section">
     <h2>工作经历</h2>
+    <div class="section-body">
     <article class="entry">
       <h3 class="entry-head">
         <span class="entry-main">
@@ -212,11 +213,12 @@ themes/my-theme/
       </h3>
       …
     </article>
+    </div>
   </section>
 </main>
 ```
 
-`resume` 是页面容器；`resume-header`、`name`、`role`、`contact` 组成可选页眉。`h2` 开始一个 `section`。在 section 内，每个 `h3` 开始一个 `article.entry`，即使没有日期也是如此。识别出的带日期 `h3` / `h4` 使用 `entry-head`、`entry-main`、`entry-title`、可选的 `entry-sub` 和 `entry-date`。没有日期的 `h3` 没有 `entry-head`，也没有自动生成的 span。`h4` 不会开始另一个 article。
+`resume` 是页面容器；`resume-header`、`name`、`role`、`contact` 组成可选页眉。`h2` 开始一个 `section`，其后的内容包在 `section-body` 中。在 section 内，每个 `h3` 开始一个 `article.entry`，即使没有日期也是如此。识别出的带日期 `h3` / `h4` 使用 `entry-head`、`entry-main`、`entry-title`、可选的 `entry-sub` 和 `entry-date`。没有日期的 `h3` 没有 `entry-head`，也没有自动生成的 span。`h4` 不会开始另一个 article。
 
 ### 字体与样式调试
 
