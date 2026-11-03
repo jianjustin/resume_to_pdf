@@ -44,6 +44,11 @@ test('unknown command is diagnosed before loading themes', async () => {
   assert.ok(e.text.includes('Unknown command: make'));
 });
 
+test('built-in themes include default', async () => {
+  const o = io(); assert.equal(await main(['themes'], { stdout: o }), 0);
+  assert.match(o.text, /^\s*default\s+Clean single-column/m);
+});
+
 test('themes lists fixture themes and authors', async () => {
   const o = io();
   assert.equal(await main(['themes'], { stdout: o, themesDir: FIX }), 0);
