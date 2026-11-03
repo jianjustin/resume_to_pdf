@@ -28,9 +28,9 @@ export function listThemes(themesDir = THEMES_DIR) {
       const templatePath = path.join(dir, 'template.html');
       return [{
         id,
-        name: metadata?.name ?? id,
-        description: metadata?.description ?? '',
-        author: metadata?.author ?? '',
+        name: String(metadata?.name ?? id),
+        description: String(metadata?.description ?? ''),
+        author: String(metadata?.author ?? ''),
         dir,
         cssPath,
         templatePath: fs.existsSync(templatePath) ? templatePath : null,

@@ -21,6 +21,28 @@ test('lists only directories with theme.css, with metadata defaults', () => {
   assert.equal(themes[0].cssPath, path.join(FIX, 'basic', 'theme.css'));
 });
 
+test('listThemes and loadTheme normalize metadata fields to strings after defaults', () => {
+  const dir = fs.mkdtempSync(path.join(tmp, 'metadata-'));
+  const fixtures = [
+    ['mixed', { name: 17, description: [], author: false }, ['17', '', 'false']],
+    ['objects', { name: {}, description: { text: 'description' }, author: { name: 'author' } },
+      ['[object Object]', '[object Object]', '[object Object]']],
+    ['nullish', { name: null, description: null }, ['nullish', '', '']],
+  ];
+  for (const [id, metadata] of fixtures) {
+    fs.mkdirSync(path.join(dir, id));
+    fs.writeFileSync(path.join(dir, id, 'theme.css'), 'body{}');
+    fs.writeFileSync(path.join(dir, id, 'theme.json'), JSON.stringify(metadata));
+  }
+  const themes = listThemes(dir);
+  for (const [id, , expected] of fixtures) {
+    for (const theme of [themes.find((candidate) => candidate.id === id), loadTheme(id, dir)]) {
+      assert.deepEqual([theme.name, theme.description, theme.author], expected);
+      assert.ok([theme.name, theme.description, theme.author].every((value) => typeof value === 'string'));
+    }
+  }
+});
+
 test('THEMES_DIR is the absolute package themes directory', () => {
   assert.equal(THEMES_DIR, fileURLToPath(new URL('../themes/', import.meta.url)));
   assert.ok(path.isAbsolute(THEMES_DIR));
