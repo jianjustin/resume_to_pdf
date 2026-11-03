@@ -25,12 +25,35 @@ for (const [heading, title, subtitle] of [
   ['[Research｜Labs](https://example.com/a|b)｜Engineer｜Lead (2021 - 2022)', '<a href="https://example.com/a%7Cb">Research｜Labs</a>', 'Engineer · Lead'],
   ['Acme | [Engineer | Lead](https://example.com/a_(b|c)) (2021 - 2022)', 'Acme', '<a href="https://example.com/a_(b%7Cc)">Engineer | Lead</a>'],
   ['``Research `|` Labs`` ｜ Engineer | 2021 - 2022', '<code>Research `|` Labs</code>', 'Engineer'],
+  ['<https://example.com/a|b> | Engineer (2021 - 2022)', '<a href="https://example.com/a%7Cb">https://example.com/a|b</a>', 'Engineer'],
+  ['Acme | <https://example.com/a|b> | Lead (2021 - 2022)', 'Acme', '<a href="https://example.com/a%7Cb">https://example.com/a|b</a> · Lead'],
+  ['<https://example.com/a|b> | 2021 - 2022', '<a href="https://example.com/a%7Cb">https://example.com/a|b</a>', ''],
+  ['<https://example.com/a｜b>｜Engineer｜2021 - 2022', '<a href="https://example.com/a%EF%BD%9Cb">https://example.com/a｜b</a>', 'Engineer'],
+  ['<a|b@example.com> | Engineer (2021 - 2022)', '<a href="mailto:a%7Cb@example.com">a|b@example.com</a>', 'Engineer'],
+  ['<https://example.com/a[`|b> | Engineer (2021 - 2022)', '<a href="https://example.com/a%5B%60%7Cb">https://example.com/a[`|b</a>', 'Engineer'],
+  ['<https://example.com/(a|b)> | Engineer | 2021 - 2022', '<a href="https://example.com/(a%7Cb)">https://example.com/(a|b)</a>', 'Engineer'],
+  ['<https://example.com> | Engineer (2021 - 2022)', '<a href="https://example.com">https://example.com</a>', 'Engineer'],
 ]) {
   test(`entry inline Markdown survives splitting: ${heading}`, () => {
     const html = renderBody(`### ${heading}`);
     assert.ok(html.includes(`<span class="entry-title">${title}</span>`), html);
     if (subtitle) assert.ok(html.includes(`<span class="entry-sub">${subtitle}</span>`), html);
     else assert.ok(!html.includes('entry-sub'), html);
+    assert.ok(html.includes('<span class="entry-date">2021 – 2022</span>'), html);
+  });
+}
+
+for (const [heading, title, subtitle] of [
+  ['Research < 5 | Engineer > 3 (2021 - 2022)', 'Research &lt; 5', 'Engineer &gt; 3'],
+  ['<https://example.com/a | b> | Engineer (2021 - 2022)', '&lt;<a href="https://example.com/a">https://example.com/a</a>', 'b&gt; · Engineer'],
+  ['<x:a|b> | Engineer (2021 - 2022)', '&lt;x:a', 'b&gt; · Engineer'],
+  ['<javascript:a|b> | Engineer (2021 - 2022)', '&lt;javascript:a', 'b&gt; · Engineer'],
+  ['<https://example.com/a|b | Engineer (2021 - 2022)', '&lt;<a href="https://example.com/a">https://example.com/a</a>', 'b · Engineer'],
+]) {
+  test(`non-autolink angle text keeps structural separators: ${heading}`, () => {
+    const html = renderBody(`### ${heading}`);
+    assert.ok(html.includes(`<span class="entry-title">${title}</span>`), html);
+    assert.ok(html.includes(`<span class="entry-sub">${subtitle}</span>`), html);
     assert.ok(html.includes('<span class="entry-date">2021 – 2022</span>'), html);
   });
 }

@@ -24,6 +24,19 @@ const entries = [
   ['``Research `|` Labs`` ｜ Engineer | 2021 - 2022', '``Research `|` Labs``', 'Engineer', '2021 – 2022'],
   [String.raw`Research \\| Engineer (2021 - 2022)`, String.raw`Research \\`, 'Engineer', '2021 – 2022'],
   ['Research (Platform) | Engineer (2021 - 2022)', 'Research (Platform)', 'Engineer', '2021 – 2022'],
+  ['<https://example.com/a|b> | Engineer (2021 - 2022)', '<https://example.com/a|b>', 'Engineer', '2021 – 2022'],
+  ['Acme | <https://example.com/a|b> | Lead (2021 - 2022)', 'Acme', '<https://example.com/a|b> · Lead', '2021 – 2022'],
+  ['<https://example.com/a|b> | 2021 - 2022', '<https://example.com/a|b>', '', '2021 – 2022'],
+  ['<https://example.com/a｜b>｜Engineer｜2021 - 2022', '<https://example.com/a｜b>', 'Engineer', '2021 – 2022'],
+  ['<a|b@example.com> | Engineer (2021 - 2022)', '<a|b@example.com>', 'Engineer', '2021 – 2022'],
+  ['<https://example.com/a[`|b> | Engineer (2021 - 2022)', '<https://example.com/a[`|b>', 'Engineer', '2021 – 2022'],
+  ['<https://example.com/(a|b)> | Engineer | 2021 - 2022', '<https://example.com/(a|b)>', 'Engineer', '2021 – 2022'],
+  ['<https://example.com> | Engineer (2021 - 2022)', '<https://example.com>', 'Engineer', '2021 – 2022'],
+  ['Research < 5 | Engineer > 3 (2021 - 2022)', 'Research < 5', 'Engineer > 3', '2021 – 2022'],
+  ['<https://example.com/a | b> | Engineer (2021 - 2022)', '<https://example.com/a', 'b> · Engineer', '2021 – 2022'],
+  ['<x:a|b> | Engineer (2021 - 2022)', '<x:a', 'b> · Engineer', '2021 – 2022'],
+  ['<javascript:a|b> | Engineer (2021 - 2022)', '<javascript:a', 'b> · Engineer', '2021 – 2022'],
+  ['<https://example.com/a|b | Engineer (2021 - 2022)', '<https://example.com/a', 'b · Engineer', '2021 – 2022'],
 ];
 for (const [text, title, subtitle, date] of entries) {
   test(`entry: ${text}`, () => assert.deepEqual(parseEntryHeading(text), { title, subtitle, date }));

@@ -1,3 +1,6 @@
+import MarkdownIt from 'markdown-it';
+
+const autolinkMarkdown = new MarkdownIt('zero').enable('autolink');
 const D = String.raw`\d{4}(?:\s*[./\-年]\s*\d{1,2}\s*月?)?`;
 const END = `(?:${D}|至今|今|现在|present|now|current)`;
 const SEP = '(?:—|–|-|~|～|〜|至|to)';
@@ -33,6 +36,17 @@ function headingDelimiters(text) {
       else if (char === '(') destination++;
       else if (char === ')') destination--;
       continue;
+    }
+    if (char === '<') {
+      const closing = text.indexOf('>', i + 1);
+      if (closing !== -1) {
+        // Use Markdown-it's autolink grammar and URL validation, not arbitrary angle text.
+        const tokens = autolinkMarkdown.parseInline(text.slice(i, closing + 1), {})[0].children;
+        if (tokens.length === 3 && tokens[0].markup === 'autolink') {
+          i = closing;
+          continue;
+        }
+      }
     }
     if (char === '`') {
       const opening = /^`+/.exec(text.slice(i))[0];
