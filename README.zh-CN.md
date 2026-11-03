@@ -134,7 +134,7 @@ npx resume-to-pdf themes
 
 ## 主题
 
-- **`default`** — 整洁的单栏布局，搭配低饱和海军蓝强调色，便于快速浏览。作者：jianjustin。
+- **`default`** — 单栏布局，区块以顶部标签页卡片呈现，海军蓝搭配橙色点缀，便于快速浏览。作者：jianjustin。
 
 ## 新增主题
 

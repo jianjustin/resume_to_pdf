@@ -134,7 +134,7 @@ The first three are dated entries; the last remains an ordinary heading. Mark im
 
 ## Themes
 
-- **`default`** — Clean single-column layout with a muted navy accent, built for quick scanning. Author: jianjustin.
+- **`default`** — Single-column layout with tabbed section cards, a navy and orange accent, built for quick scanning. Author: jianjustin.
 
 ## Creating a theme
 

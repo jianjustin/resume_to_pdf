@@ -46,7 +46,7 @@ test('unknown command is diagnosed before loading themes', async () => {
 
 test('built-in themes include default', async () => {
   const o = io(); assert.equal(await main(['themes'], { stdout: o }), 0);
-  assert.match(o.text, /^\s*default\s+Clean single-column/m);
+  assert.match(o.text, /^\s*default\s+Single-column layout with tabbed section cards/m);
 });
 
 test('themes lists fixture themes and authors', async () => {
