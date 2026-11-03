@@ -18,6 +18,32 @@ test('inline markdown inside entry parts is rendered', () => {
   assert.ok(renderBody('### [Acme](https://acme.test) | Engineer (2021 - 2022)')
     .includes('<span class="entry-title"><a href="https://acme.test">Acme</a></span>'));
 });
+for (const [heading, title, subtitle] of [
+  ['[Research | Labs](https://example.com) | Engineer (2021 - 2022)', '<a href="https://example.com">Research | Labs</a>', 'Engineer'],
+  [String.raw`Research \| Labs (2021 - 2022)`, 'Research | Labs', ''],
+  ['`Research | Labs` | Engineer (2021 - 2022)', '<code>Research | Labs</code>', 'Engineer'],
+  ['[Research｜Labs](https://example.com/a|b)｜Engineer｜Lead (2021 - 2022)', '<a href="https://example.com/a%7Cb">Research｜Labs</a>', 'Engineer · Lead'],
+  ['Acme | [Engineer | Lead](https://example.com/a_(b|c)) (2021 - 2022)', 'Acme', '<a href="https://example.com/a_(b%7Cc)">Engineer | Lead</a>'],
+  ['``Research `|` Labs`` ｜ Engineer | 2021 - 2022', '<code>Research `|` Labs</code>', 'Engineer'],
+]) {
+  test(`entry inline Markdown survives splitting: ${heading}`, () => {
+    const html = renderBody(`### ${heading}`);
+    assert.ok(html.includes(`<span class="entry-title">${title}</span>`), html);
+    if (subtitle) assert.ok(html.includes(`<span class="entry-sub">${subtitle}</span>`), html);
+    else assert.ok(!html.includes('entry-sub'), html);
+    assert.ok(html.includes('<span class="entry-date">2021 – 2022</span>'), html);
+  });
+}
+
+test('ambiguous unbalanced entry headings keep ordinary Markdown rendering', () => {
+  for (const heading of ['[Research | Labs (2021 - 2022)', '`Research | Labs (2021 - 2022)',
+    '[Research](https://example.com/a|b (2021 - 2022)', String.raw`Research \| 2021 - 2022`]) {
+    const html = renderBody(`### ${heading}`);
+    assert.ok(!html.includes('entry-head'), html);
+    assert.ok(html.includes('<h3>'), html);
+  }
+});
+
 test('headings without a date stay plain', () => {
   assert.ok(renderBody('### 指标口径治理').includes('<h3>指标口径治理</h3>'));
   assert.ok(renderBody('### A | B').includes('<h3>A | B</h3>'));

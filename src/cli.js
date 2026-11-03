@@ -54,16 +54,22 @@ export async function main(argv, { stdout = process.stdout, stderr = process.std
     const inputPath = path.resolve(input);
     if (!fs.existsSync(inputPath)) throw new Error(`Input file not found: ${input}`);
 
+    const extension = command === 'build' ? '.pdf' : '.html';
+    const outputPath = values.output === undefined
+      ? inputPath.replace(/\.(?:md|markdown)$/, '') + extension
+      : path.resolve(values.output);
+    if (outputPath === inputPath) throw new Error('Output file must not refer to the input file');
+    const source = fs.statSync(inputPath, { bigint: true });
+    const output = fs.statSync(outputPath, { bigint: true, throwIfNoEntry: false });
+    if (output && source.dev === output.dev && source.ino === output.ino) {
+      throw new Error('Output file must not refer to the input file');
+    }
+
     const theme = loadTheme(values.theme, themesDir);
     const html = renderDocument(fs.readFileSync(inputPath, 'utf8'), {
       theme,
       baseDir: path.dirname(inputPath),
     });
-    const extension = command === 'build' ? '.pdf' : '.html';
-    const outputPath = values.output === undefined
-      ? inputPath.replace(/\.(?:md|markdown)$/, '') + extension
-      : path.resolve(values.output);
-
     if (command === 'build') {
       await htmlToPdf(html, outputPath);
       stdout.write(`PDF written to ${outputPath}\n`);

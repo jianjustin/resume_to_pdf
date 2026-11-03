@@ -44,6 +44,23 @@ test('writes a pdf into missing dirs, including spaces and CJK', { timeout: 6000
   assertCleaned(resources);
 });
 
+for (const [name, css, width, height] of [
+  ['A4 fallback without @page CSS', 'body {}', 210 / 25.4 * 72, 297 / 25.4 * 72],
+  ['explicit CSS page size overrides A4 fallback', '@page { size: 100mm 150mm; }', 100 / 25.4 * 72, 150 / 25.4 * 72],
+]) {
+  test(`real PDF geometry: ${name}`, { timeout: 60000 }, async () => {
+    const out = path.join(tmp, `${width}.pdf`);
+    await htmlToPdf(`<!doctype html><style>${css}</style><p>Page geometry</p>`, out);
+    // Chromium writes page geometry as uncompressed MediaBox arrays in PDF points.
+    const boxes = [...fs.readFileSync(out, 'latin1').matchAll(/\/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]/g)];
+    assert.ok(boxes.length > 0, 'generated PDF must expose page geometry');
+    for (const [, actualWidth, actualHeight] of boxes) {
+      assert.ok(Math.abs(Number(actualWidth) - width) < 1, `width: ${actualWidth}, expected ${width}`);
+      assert.ok(Math.abs(Number(actualHeight) - height) < 1, `height: ${actualHeight}, expected ${height}`);
+    }
+  });
+}
+
 test('launch failure is reported with a code', { timeout: 60000 }, async (t) => {
   const resources = trackResources(t);
   await assert.rejects(htmlToPdf('<p>x</p>', path.join(tmp, 'x.pdf'), { launchOptions: { executablePath: '/nonexistent/chrome' } }),

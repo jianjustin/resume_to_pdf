@@ -21,7 +21,7 @@ export async function htmlToPdf(html, outputPath, { launchOptions } = {}) {
     await page.goto(pathToFileURL(file).href, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
-    await page.pdf({ path: outputPath, preferCSSPageSize: true, printBackground: true });
+    await page.pdf({ path: outputPath, format: 'A4', preferCSSPageSize: true, printBackground: true });
   } finally {
     try {
       if (browser) await browser.close();

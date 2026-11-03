@@ -150,6 +150,51 @@ test('preview replaces the .markdown extension', async () => {
   assert.equal(o.text, `HTML written to ${out}\n`);
 });
 
+for (const command of ['build', 'preview']) {
+  for (const alias of ['identical', 'relative', 'symlink', 'hard-link', 'symlink-directory']) {
+    test(`${command} rejects ${alias} source/output collisions without changing source bytes`, async (t) => {
+      const dir = fs.mkdtempSync(path.join(tmp, 'collision-'));
+      const source = path.join(dir, 'resume.md');
+      const original = Buffer.from('---\nname: 苏晚\n---\n### Research \\| Labs (2021 - 2022)\n');
+      fs.writeFileSync(source, original);
+      let output = source;
+      if (alias === 'relative') output = path.relative(process.cwd(), source);
+      if (alias === 'symlink' || alias === 'hard-link') {
+        output = path.join(dir, 'alias.md');
+        if (alias === 'symlink') fs.symlinkSync(source, output);
+        else fs.linkSync(source, output);
+      }
+      if (alias === 'symlink-directory') {
+        fs.symlinkSync(dir, path.join(dir, 'alias-dir'));
+        output = path.join(dir, 'alias-dir', 'resume.md');
+      }
+      let launched = false;
+      t.mock.method(puppeteer, 'launch', async () => {
+        launched = true;
+        throw new Error('Collision must be rejected before browser launch');
+      });
+      const o = io();
+      const e = io();
+      const status = await main([command, source, '--theme', 'basic', '-o', output],
+        { stdout: o, stderr: e, themesDir: FIX });
+      assert.deepEqual(fs.readFileSync(source), original, 'source bytes must be preserved');
+      assert.equal(status, 1);
+      assert.match(e.text, /Output file must not refer to the input file/);
+      assert.equal(o.text, '');
+      assert.equal(launched, false);
+    });
+  }
+  test(`${command} still replaces a distinct existing output artifact`, { timeout: 60000 }, async () => {
+    const out = path.join(tmp, `replace-${command}.${command === 'build' ? 'pdf' : 'html'}`);
+    fs.writeFileSync(out, 'old artifact');
+    const original = fs.readFileSync(input);
+    assert.equal(await main([command, input, '--theme', 'basic', '-o', out],
+      { stdout: io(), themesDir: FIX }), 0);
+    assert.deepEqual(fs.readFileSync(input), original);
+    assert.ok(fs.readFileSync(out, 'utf8').startsWith(command === 'build' ? '%PDF-' : '<!doctype html>'));
+  });
+}
+
 test('preview write failures return a diagnostic and no success output', async () => {
   const blocked = path.join(tmp, 'blocked');
   fs.writeFileSync(blocked, 'not a directory');
