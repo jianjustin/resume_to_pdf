@@ -14,6 +14,12 @@ test('no entry-sub without subtitle', () => {
   assert.ok(html.includes('<span class="entry-main"><span class="entry-title">门店选址评分模型</span></span><span class="entry-date">2023.06 – 2023.11</span>'));
   assert.ok(!html.includes('entry-sub'));
 });
+test('bold closes after CJK punctuation followed by CJK text', () => {
+  assert.ok(renderBody('- **卡券系统与第三方平台对接：**设计并实现')
+    .includes('<li><strong>卡券系统与第三方平台对接：</strong>设计并实现</li>'));
+  assert.ok(renderBody('### **青禾生鲜（华东）**（2022 - 2023）')
+    .includes('<span class="entry-title"><strong>青禾生鲜（华东）</strong></span>'));
+});
 test('inline markdown inside entry parts is rendered', () => {
   assert.ok(renderBody('### [Acme](https://acme.test) | Engineer (2021 - 2022)')
     .includes('<span class="entry-title"><a href="https://acme.test">Acme</a></span>'));

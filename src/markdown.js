@@ -1,4 +1,5 @@
 import MarkdownIt from 'markdown-it';
+import cjkFriendly from 'markdown-it-cjk-friendly';
 import { parseEntryHeading } from './entry.js';
 
 function htmlToken(state, type, content) {
@@ -9,7 +10,7 @@ function htmlToken(state, type, content) {
 }
 
 export function createMarkdown() {
-  const md = new MarkdownIt({ html: true, linkify: true, typographer: false });
+  const md = new MarkdownIt({ html: true, linkify: true, typographer: false }).use(cjkFriendly);
 
   md.core.ruler.push('resume_entry_headings', (state) => {
     for (let i = 0; i < state.tokens.length; i++) {
